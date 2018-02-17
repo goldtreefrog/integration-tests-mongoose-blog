@@ -1,4 +1,4 @@
-BlogPost"use strict";
+"use strict";
 
 const chai = require("chai");
 const chaiHttp = require("chai-http");
@@ -30,20 +30,9 @@ function seedBlogData() {
 }
 
 function generateAuthor() {
-  const firstName = faker();
-  const lastName = faker();
+  const firstName = faker.name.firstName();
+  const lastName = faker.name.lastName();
   return { firstName: firstName, lastName: lastName };
-}
-// used to generate data to put in db
-function generateBoroughName() {
-  const boroughs = ["Manhattan", "Queens", "Brooklyn", "Bronx", "Staten Island"];
-  return boroughs[Math.floor(Math.random() * boroughs.length)];
-}
-
-// used to generate data to put in db
-function generateCuisineType() {
-  const cuisines = ["Italian", "Thai", "Colombian"];
-  return cuisines[Math.floor(Math.random() * cuisines.length)];
 }
 
 // generate an object represnting a blog.
@@ -51,13 +40,16 @@ function generateCuisineType() {
 // or request.body data
 function generateBlogData() {
   return {
-    title: faker(), // ???
+    title: faker.lorem.sentence(),
     author: generateAuthor(),
-    content: faker() // ???
-    // name: faker.company.companyName()
+    content: faker.lorem.paragraphs(),
+    created: generateDate()
   };
 }
 
+function generateDate() {
+  return new Date(faker.date.past());
+}
 // this function deletes the entire database.
 // we'll call it in an `afterEach` block below
 // to ensure data from one test does not stick
@@ -109,11 +101,13 @@ describe("Blog Posts API resource", function() {
           res = _res;
           expect(res).to.have.status(200);
           // otherwise our db seeding didn't work
+          expect(res.body.posts).not.to.be.undefined;
           expect(res.body.posts).to.have.length.of.at.least(1);
           return BlogPost.count();
         })
         .then(function(count) {
-          expect(res.body.posts).to.have.length.of(count);
+          expect(res.body.posts).to.have.length(count);
+          // expect(res.body.restaurants).to.have.length.of(count);
         });
     });
 
@@ -132,7 +126,7 @@ describe("Blog Posts API resource", function() {
 
           res.body.posts.forEach(function(post) {
             expect(post).to.be.a("object");
-            expect(post).to.include.keys("id", "name", "cuisine", "borough", "grade", "address");
+            expect(post).to.include.keys("id", "title", "author", "content", "created");
           });
           resBlogPost = res.body.posts[0];
           return BlogPost.findById(resBlogPost.id);
@@ -140,9 +134,9 @@ describe("Blog Posts API resource", function() {
         .then(function(post) {
           expect(resBlogPost.id).to.equal(post.id);
           expect(resBlogPost.title).to.equal(post.title);
-          expect(resBlogPost.authorName).to.equal(post.authorName);
+          expect(resBlogPost.author).to.equal(post.authorName);
+          expect(resBlogPost.author).to.contain(post.author.lastName);
           expect(resBlogPost.content).to.equal(post.content);
-          expect(resBlogPost.authorName).to.contain(post.author.lastName);
         });
     });
   });
@@ -164,22 +158,19 @@ describe("Blog Posts API resource", function() {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.a("object");
-          expect(res.body).to.include.keys("id", "name", "cuisine", "borough", "grade", "address");
-          expect(res.body.name).to.equal(newBlogPost.name);
-          // cause Mongo should have created id on insertion
+          expect(res.body).to.include.keys("id", "title", "author", "content");
+          expect(res.body.author).to.equal(newBlogPost.author.firstName + " " + newBlogPost.author.lastName);
+          // because Mongo should have created id on insertion
           expect(res.body.id).to.not.be.null;
-          expect(res.body.author).to.equal(newBlogPost.author);
           expect(res.body.content).to.equal(newBlogPost.content);
-
-          mostRecentGrade = newpost.grades.sort((a, b) => b.date - a.date)[0].grade;
-
-          expect(res.body.grade).to.equal(mostRecentGrade);
           return BlogPost.findById(res.body.id);
         })
         .then(function(post) {
           expect(post.title).to.equal(newBlogPost.title);
-          expect(post.author).to.equal(newBlogPost.author);
+          expect(post.author.firstName).to.equal(newBlogPost.author.firstName);
+          expect(post.author.lastName).to.equal(newBlogPost.author.lastName);
           expect(post.content).to.equal(newBlogPost.content);
+          expect(post.created).to.deep.equal(newBlogPost.created); // Must use deep.equal here or doesn't work.
         });
     });
   });
@@ -192,8 +183,8 @@ describe("Blog Posts API resource", function() {
     //  4. Prove blog post in db is correctly updated
     it("should update fields you send over", function() {
       const updateData = {
-        name: "fofofofofofofof",
-        cuisine: "futuristic fusion"
+        title: "Stuffy Title",
+        content: "Way too much sugar is way too bad for you."
       };
 
       return BlogPost.findOne()
@@ -213,8 +204,8 @@ describe("Blog Posts API resource", function() {
           return BlogPost.findById(updateData.id);
         })
         .then(function(post) {
-          expect(post.name).to.equal(updateData.name);
-          expect(post.cuisine).to.equal(updateData.cuisine);
+          expect(post.title).to.equal(updateData.title);
+          expect(post.content).to.equal(updateData.content);
         });
     });
   });

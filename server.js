@@ -55,7 +55,7 @@ app.post("/posts", (req, res) => {
     title: req.body.title,
     content: req.body.content,
     author: req.body.author,
-    created: req.body.created // mjb 20180217
+    created: req.body.created
   })
     .then(blogPost => res.status(201).json(blogPost.serialize()))
     .catch(err => {
