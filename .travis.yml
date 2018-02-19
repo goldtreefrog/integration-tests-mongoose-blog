@@ -1,0 +1,9 @@
+language: node_js
+node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: MI2nNJ9ySPQOGR+F7aCOYi6nemlHBBb2zwVu+EbQxjYDDFtVF5Vwx+CWLDNLPP+nFg4EvhrwJnRVO4faf8KkE/YsL1WM4sNjt/xB2+M1BBbZ2yAjflHofR2JajjIZMrt71HzESvC0nfUwwBy0R73SJHnNb8EdlOyKbZKMonPF7168/Ro487Jklc+9d1tiqby3zI6Fxphibb83jBZXSvYX1eJD3lz0iRZQwhUDuuXot/qNhPrWKfKWrkrqwwzQKm/G6b/EqB/a74ybxykNBfn6Ag20qpJ1tQeZ68Hmf4sIoIlgJvPn4TDJTRUaH9XqcNuilRs+3ZIw360yHzMSr49Z3sNOm6EH8I+Ph5J15SkIQ/r0uhXWCVcfClmVI6AS+spK8WGwWh4lkhAPcN5AclonLWuPoqk1O/zaZ2rNe/GRTB+gaJmCAMrtkSKBzOOZBxVNe/0YYjAaPuVaDXsqMXvSs3kp4GsdXUK8qkM1rfkLVx65CAhF+dWjW/u4DDmVlpzhH2amn/ZWbLNQimnhP/z7kjwF76TxKzPpSvbQnXnrD00PjUSFo8+nPLV2OVwixKnzpE8cvbTEGzVHqab+yUdeUxy/seKoeJ/jwzgs9JxL4tICq2oItXEZL2CEnxTM6LwOAaEw7jVTCoaS/i4omeRlP6VJ7qR8qgll+wnXscj75Y=
+  app: whispering-brook-79682
